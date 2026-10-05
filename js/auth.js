@@ -97,6 +97,20 @@ const Auth = (function () {
   // EMAIL OTP REGISTRATION FLOW
   // ==========================================
 
+  function playOtpSentSound() {
+    const audio = document.getElementById("otpSentAudio");
+    if (!(audio instanceof HTMLAudioElement)) {
+      console.error("[ScanGuard] OTP confirmation audio element is missing.");
+      return;
+    }
+
+    audio.currentTime = 0;
+    audio.play().catch(error => {
+      console.warn("[ScanGuard] Could not play the OTP confirmation sound.", error);
+      showToast("OTP sent, but the confirmation sound could not be played.", "warning");
+    });
+  }
+
   async function handleSendRegisterOtp(e) {
     e.preventDefault();
     const emailInput = document.getElementById("regEmail");
@@ -117,6 +131,7 @@ const Auth = (function () {
 
     if (res.success) {
       currentPendingEmail = email;
+      playOtpSentSound();
       showAuthAlert("regAlert", res.message || "OTP sent successfully! Check your inbox.", "success");
       
       // If local demo mode, highlight demo OTP
